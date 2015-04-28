@@ -264,10 +264,11 @@ class WayForPay
      */
     public function isPaymentValid($response)
     {
-        $sign = $this->getResponseSignature($response);
-        if (!isset($response['merchantSignature']) && isset($_POST['reason'])) {
-            return $_POST['reason'];
+        
+        if (!isset($response['merchantSignature']) && isset($response['reason'])) {
+            return $response['reason'];
         }
+		$sign = $this->getResponseSignature($response);
         if ($sign != $response['merchantSignature']) {
             return 'An error has occurred during payment';
         }
