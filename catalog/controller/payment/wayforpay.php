@@ -1,0 +1,291 @@
+<?php
+
+class ControllerPaymentWayforpay extends Controller
+{
+    public function index()
+    {
+        $w4p = new WayForPay();
+        $key = $this->config->get('wayforpay_secretkey');
+        $w4p->setSecretKey($key);
+
+        $order_id = $this->session->data['order_id'];
+
+        $this->load->model('checkout/order');
+        $order = $this->model_checkout_order->getOrder($this->session->data['order_id']);
+
+        $serviceUrl = $this->config->get('wayforpay_serviceUrl');
+        $returnUrl = $this->config->get('wayforpay_returnUrl');
+
+        $fields = array(
+            'orderReference' => $order_id . WayForPay::ORDER_SEPARATOR . time(),
+            'merchantAccount' => $this->config->get('wayforpay_merchant'),
+            'orderDate' => strtotime($order['date_added']),
+            'merchantAuthType' => 'simpleSignature',
+            'merchantDomainName' => $_SERVER['HTTP_HOST'],
+            'merchantTransactionSecureType' => 'AUTO',
+            'amount' => round($order['total'], 2),
+            'currency' => 'UAH',
+            'serviceUrl' => $serviceUrl,
+            'returnUrl' => $returnUrl,
+            'language' => $this->config->get('wayforpay_language')
+        );
+
+        if ($order['currency_code'] != 'UAH') {
+            $fields['alternativeCurrency'] = $order['currency_code'];
+            $fields['alternativeAmount'] = round(($order['total'] * $order['currency_value']), 2);
+        }
+
+        $productNames = array();
+        $productQty = array();
+        $productPrices = array();
+        $this->load->model('account/order');
+        $products = $this->model_account_order->getOrderProducts($order_id);
+        foreach ($products as $product) {
+            $productNames[] = $product['name'];
+            $productPrices[] = round($product['price']);
+            $productQty[] = $product['quantity'];
+        }
+
+        $fields['productName'] = $productNames;
+        $fields['productPrice'] = $productPrices;
+        $fields['productCount'] = $productQty;
+
+        /**
+         * Check phone
+         */
+        $phone = str_replace(array('+', ' ', '(', ')'), array('', '', '', ''), $order['telephone']);
+        if (strlen($phone) == 10) {
+            $phone = '38' . $phone;
+        } elseif (strlen($phone) == 11) {
+            $phone = '3' . $phone;
+        }
+
+        $fields['clientFirstName'] = $order['payment_firstname'];
+        $fields['clientLastName'] = $order['payment_lastname'];
+        $fields['clientEmail'] = $order['email'];
+        $fields['clientPhone'] = $phone;
+        $fields['clientCity'] = $order['payment_city'];
+        $fields['clientAddress'] = $order['payment_address_1'] . ' ' . $order['payment_address_2'];
+        $fields['clientCountry'] = $order['payment_iso_code_3'];
+
+        $fields['merchantSignature'] = $w4p->getRequestSignature($fields);
+
+        $data['fields'] = $fields;
+        $data['action'] = WayForPay::URL;
+        $data['button_confirm'] = $this->language->get('button_confirm');
+        $data['continue'] = $this->url->link('checkout/success');
+
+        if (file_exists(DIR_TEMPLATE . $this->config->get('config_template') . '/template/payment/wayforpay.tpl')) {
+            return $this->load->view($this->config->get('config_template') . '/template/payment/wayforpay.tpl', $data);
+        } else {
+            return $this->load->view('default/template/payment/wayforpay.tpl', $data);
+        }
+
+    }
+
+    public function confirm()
+    {
+
+        $this->load->model('checkout/order');
+
+        $order_info = $this->model_checkout_order->getOrder($this->session->data['order_id']);
+        if (!$order_info) return;
+
+        $order_id = $this->session->data['order_id'];
+
+        if ($order_info['order_status_id'] == 0) {
+            $this->model_checkout_order->confirm($order_id, $this->config->get('wayforpay_order_status_progress_id'), 'WayForPay');
+            return;
+        }
+
+        if ($order_info['order_status_id'] != $this->config->get('wayforpay_order_status_progress_id')) {
+            $this->model_checkout_order->update($order_id, $this->config->get('wayforpay_order_status_progress_id'), 'WayForPay', true);
+        }
+    }
+
+    public function response()
+    {
+
+        $w4p = new WayForPay();
+        $key = $this->config->get('wayforpay_secretkey');
+        $w4p->setSecretKey($key);
+
+        $paymentInfo = $w4p->isPaymentValid($_POST);
+
+        if ($paymentInfo === true) {
+            list($order_id,) = explode(WayForPay::ORDER_SEPARATOR, $_POST['orderReference']);
+
+            $message = '';
+
+            $this->load->model('checkout/order');
+            $this->model_checkout_order->addOrderHistory($order_id, $this->config->get('wayforpay_order_status_id'), $message, false);
+
+            $this->response->redirect($this->url->link('checkout/success'));
+        } else {
+            $this->session->data['error'] = $paymentInfo;
+            $this->response->redirect($this->url->link('checkout/checkout', '', 'SSL'));
+        }
+    }
+
+    public function callback()
+    {
+
+        $data = json_decode(file_get_contents("php://input"), true);
+
+        $w4p = new WayForPay();
+        $key = $this->config->get('wayforpay_secretkey');
+        $w4p->setSecretKey($key);
+
+        $paymentInfo = $w4p->isPaymentValid($data);
+
+        if ($paymentInfo === true) {
+            list($order_id,) = explode(WayForPay::ORDER_SEPARATOR, $data['orderReference']);
+
+            $message = '';
+
+            $this->load->model('checkout/order');
+            $this->model_checkout_order->addOrderHistory($order_id, $this->config->get('wayforpay_order_status_id'), $message, false);
+
+            echo $w4p->getAnswerToGateWay($data);
+        } else {
+            echo $paymentInfo;
+        }
+        exit();
+    }
+}
+
+class WayForPay
+{
+    const ORDER_APPROVED = 'Approved';
+
+    const ORDER_SEPARATOR = '#';
+
+    const SIGNATURE_SEPARATOR = ';';
+
+    const URL = "https://secure.wayforpay.com/pay/";
+
+    protected $secret_key = '';
+    protected $keysForResponseSignature = array(
+        'merchantAccount',
+        'orderReference',
+        'amount',
+        'currency',
+        'authCode',
+        'cardPan',
+        'transactionStatus',
+        'reasonCode'
+    );
+
+    /** @var array */
+    protected $keysForSignature = array(
+        'merchantAccount',
+        'merchantDomainName',
+        'orderReference',
+        'orderDate',
+        'amount',
+        'currency',
+        'productName',
+        'productCount',
+        'productPrice'
+    );
+
+
+    /**
+     * @param $option
+     * @param $keys
+     * @return string
+     */
+    public function getSignature($option, $keys)
+    {
+        $hash = array();
+        foreach ($keys as $dataKey) {
+            if (!isset($option[$dataKey])) {
+                continue;
+            }
+            if (is_array($option[$dataKey])) {
+                foreach ($option[$dataKey] as $v) {
+                    $hash[] = $v;
+                }
+            } else {
+                $hash [] = $option[$dataKey];
+            }
+        }
+
+        $hash = implode(self::SIGNATURE_SEPARATOR, $hash);
+        return hash_hmac('md5', $hash, $this->getSecretKey());
+    }
+
+
+    /**
+     * @param $options
+     * @return string
+     */
+    public function getRequestSignature($options)
+    {
+        return $this->getSignature($options, $this->keysForSignature);
+    }
+
+    /**
+     * @param $options
+     * @return string
+     */
+    public function getResponseSignature($options)
+    {
+        return $this->getSignature($options, $this->keysForResponseSignature);
+    }
+
+
+    /**
+     * @param array $data
+     * @return string
+     */
+    public function getAnswerToGateWay($data)
+    {
+        $time = time();
+        $responseToGateway = array(
+            'orderReference' => $data['orderReference'],
+            'status' => 'accept',
+            'time' => $time
+        );
+        $sign = array();
+        foreach ($responseToGateway as $dataKey => $dataValue) {
+            $sign [] = $dataValue;
+        }
+        $sign = implode(self::SIGNATURE_SEPARATOR, $sign);
+        $sign = hash_hmac('md5', $sign, $this->getSecretKey());
+        $responseToGateway['signature'] = $sign;
+
+        return json_encode($responseToGateway);
+    }
+
+    /**
+     * @param $response
+     * @return bool|string
+     */
+    public function isPaymentValid($response)
+    {
+        $sign = $this->getResponseSignature($response);
+        if (!isset($response['merchantSignature']) && isset($_POST['reason'])) {
+            return $_POST['reason'];
+        }
+        if ($sign != $response['merchantSignature']) {
+            return 'An error has occurred during payment';
+        }
+
+        if ($response['transactionStatus'] == self::ORDER_APPROVED) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public function setSecretKey($key)
+    {
+        $this->secret_key = $key;
+    }
+
+    public function getSecretKey()
+    {
+        return $this->secret_key;
+    }
+}
