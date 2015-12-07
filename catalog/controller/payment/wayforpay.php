@@ -2,6 +2,15 @@
 
 class ControllerPaymentWayforpay extends Controller
 {
+
+    public $codesCurrency = [
+            980 => 'UAH',
+            840 => 'USD',
+            978 => 'EUR',
+            643 => 'RUB',
+
+        ];
+
     public function index()
     {
         $w4p = new WayForPay();
@@ -30,8 +39,9 @@ class ControllerPaymentWayforpay extends Controller
             'language' => $this->config->get('wayforpay_language')
         );
 
-        if ($order['currency_code'] != 'UAH') {
-            $fields['alternativeCurrency'] = $order['currency_code'];
+        $currency = isset($this->codesCurrency[$order['currency_code']]) ? $this->codesCurrency[$order['currency_code']] : $order['currency_code'];
+        if ($currency != 'UAH') {
+            $fields['alternativeCurrency'] = $currency;
             $fields['alternativeAmount'] = round(($order['total'] * $order['currency_value']), 2);
         }
 
