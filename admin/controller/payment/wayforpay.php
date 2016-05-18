@@ -103,12 +103,8 @@ class ControllerPaymentWayforpay extends Controller
     }
 
     public function install() {
-        $this->load->model('payment/wayforpay');
-        $this->model_payment_wayforpay->install();
     }
 
     public function uninstall() {
-        $this->load->model('payment/wayforpay');
-        $this->model_payment_wayforpay->uninstall();
     }
 }
