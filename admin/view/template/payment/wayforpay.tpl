@@ -52,18 +52,24 @@
                         $wayforpay_currency; ?>" class="form-control"/>
                     </div>
                 </div>
-                <div class="form-group">
+                <div class="form-group required">
                     <label class="col-sm-4 control-label"><?php echo $entry_returnUrl; ?></label>
 
                     <div class="col-sm-8"><input type="text" name="wayforpay_returnUrl"
-                                                  value="<?php echo $wayforpay_returnUrl; ?>" class="form-control"/>
+                                                 value="<?php echo $wayforpay_returnUrl; ?>" class="form-control"/>
+                        <?php if ($error_returnUrl) { ?>
+                        <div class="text-danger"><?php echo $error_returnUrl; ?></div>
+                        <?php } ?>
                     </div>
                 </div>
-                <div class="form-group">
+                <div class="form-group required">
                     <label class="col-sm-4 control-label"><?php echo $entry_serviceUrl; ?></label>
 
                     <div class="col-sm-8"><input type="text" name="wayforpay_serviceUrl"
-                                                  value="<?php echo $wayforpay_serviceUrl; ?>" class="form-control"/>
+                                                 value="<?php echo $wayforpay_serviceUrl; ?>" class="form-control"/>
+                        <?php if ($error_serviceUrl) { ?>
+                        <div class="text-danger"><?php echo $error_serviceUrl; ?></div>
+                        <?php } ?>
                     </div>
                 </div>
                 <div class="form-group">
@@ -112,7 +118,6 @@
                                                   value="<?php echo $wayforpay_sort_order; ?>" class="form-control"/>
                     </div>
                 </div>
-                </table>
             </form>
         </div>
     </div>

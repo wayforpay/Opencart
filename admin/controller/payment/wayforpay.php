@@ -21,7 +21,7 @@ class ControllerPaymentWayforpay extends Controller
             "heading_title", "text_payment", "text_success", "text_pay", "text_card",
             "entry_merchant", "entry_secretkey", "entry_order_status",
             "entry_currency", "entry_returnUrl", "entry_serviceUrl", "entry_language", "entry_status",
-            "entry_sort_order", "error_permission", "error_merchant", "error_secretkey");
+            "entry_sort_order", "error_permission", "error_merchant", "error_secretkey", "error_returnUrl", "error_serviceUrl");
 
         foreach ($arr as $v) {
             $data[$v] = $this->language->get($v);
@@ -35,7 +35,7 @@ class ControllerPaymentWayforpay extends Controller
 
 
 //------------------------------------------------------------
-        $arr = array("warning", "merchant", "secretkey", "type");
+        $arr = array("warning", "merchant", "secretkey", "type", "returnUrl", "serviceUrl");
         foreach ($arr as $v)
             $data['error_' . $v] = (isset($this->error[$v])) ? $this->error[$v] : "";
 //------------------------------------------------------------
@@ -73,6 +73,13 @@ class ControllerPaymentWayforpay extends Controller
 
         foreach ($arr as $v) {
             $data[$v] = (isset($this->request->post[$v])) ? $this->request->post[$v] : $this->config->get($v);
+            if (defined('HTTP_CATALOG') and defined('HTTPS_CATALOG') and !isset($this->request->post[$v])) {
+                if ($v == 'wayforpay_returnUrl' and empty($data[$v])) {
+                    $data[$v] = ($_SERVER['HTTPS'] ? HTTPS_CATALOG : HTTP_CATALOG) . 'index.php?route=payment/wayforpay/response';
+                } elseif ($v == 'wayforpay_serviceUrl' and empty($data[$v])) {
+                    $data[$v] = ($_SERVER['HTTPS'] ? HTTPS_CATALOG : HTTP_CATALOG) . 'index.php?route=payment/wayforpay/callback';
+                }
+            }
         }
 //------------------------------------------------------------
 
@@ -97,6 +104,14 @@ class ControllerPaymentWayforpay extends Controller
 
         if (!$this->request->post['wayforpay_secretkey']) {
             $this->error['secretkey'] = $this->language->get('error_secretkey');
+        }
+
+        if (!$this->request->post['wayforpay_returnUrl']) {
+            $this->error['returnUrl'] = $this->language->get('error_returnUrl');
+        }
+
+        if (!$this->request->post['wayforpay_serviceUrl']) {
+            $this->error['serviceUrl'] = $this->language->get('error_serviceUrl');
         }
 
         return (!$this->error) ? true : false;

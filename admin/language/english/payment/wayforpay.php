@@ -26,4 +26,6 @@ $_['entry_sort_order'] = 'Ordering:';
 $_['error_permission'] = "You haven't permission !";
 $_['error_merchant'] = 'Merchant Account is incorrect!';
 $_['error_secretkey'] = 'Secret key is empty!';
+$_['error_returnUrl'] = 'Required returnUrl!';
+$_['error_serviceUrl'] = 'Required serviceUrl!';
 ?>

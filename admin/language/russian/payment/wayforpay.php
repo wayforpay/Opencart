@@ -26,4 +26,6 @@ $_['entry_sort_order'] = 'Порядок сортировки:';
 $_['error_permission'] = 'У Вас нет прав для управления этим модулем!';
 $_['error_merchant'] = 'Неверный ID магазина (Merchant Account)!';
 $_['error_secretkey'] = 'Отсутствует секретный ключ!';
+$_['error_returnUrl'] = 'Обязателен returnUrl!';
+$_['error_serviceUrl'] = 'Обязателен serviceUrl!';
 ?>
