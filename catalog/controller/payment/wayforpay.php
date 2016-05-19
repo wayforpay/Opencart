@@ -82,12 +82,7 @@ class ControllerPaymentWayforpay extends Controller
         $data['text_loading'] = 'loading';
         $data['continue'] = $this->url->link('checkout/success');
 
-        if (file_exists(DIR_TEMPLATE . $this->config->get('config_template') . '/template/payment/wayforpay.tpl')) {
-            return $this->load->view($this->config->get('config_template') . '/template/payment/wayforpay.tpl', $data);
-        } else {
-            return $this->load->view('default/template/payment/wayforpay.tpl', $data);
-        }
-
+        return $this->load->view('payment/wayforpay.tpl', $data);
     }
 
     public function confirm()
