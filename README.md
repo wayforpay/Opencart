@@ -1,4 +1,5 @@
-#Модуль WayForPay для CMS Opencart 2
+#Модуль WayForPay для CMS версии Opencart 2.0.* - 2.1.*
+Для версий 2.2 и выше [здесь](https://github.com/wayforpay/Opencart/tree/from-2.2)
 ======
 
 #Установка
