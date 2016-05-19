@@ -75,9 +75,9 @@ class ControllerPaymentWayforpay extends Controller
             $data[$v] = (isset($this->request->post[$v])) ? $this->request->post[$v] : $this->config->get($v);
             if (defined('HTTP_CATALOG') and defined('HTTPS_CATALOG') and !isset($this->request->post[$v])) {
                 if ($v == 'wayforpay_returnUrl' and empty($data[$v])) {
-                    $data[$v] = ($_SERVER['HTTPS'] ? HTTPS_CATALOG : HTTP_CATALOG) . 'index.php?route=payment/wayforpay/response';
+                    $data[$v] = (isset($_SERVER['HTTPS']) ? HTTPS_CATALOG : HTTP_CATALOG) . 'index.php?route=payment/wayforpay/response';
                 } elseif ($v == 'wayforpay_serviceUrl' and empty($data[$v])) {
-                    $data[$v] = ($_SERVER['HTTPS'] ? HTTPS_CATALOG : HTTP_CATALOG) . 'index.php?route=payment/wayforpay/callback';
+                    $data[$v] = (isset($_SERVER['HTTPS']) ? HTTPS_CATALOG : HTTP_CATALOG) . 'index.php?route=payment/wayforpay/callback';
                 }
             }
         }
