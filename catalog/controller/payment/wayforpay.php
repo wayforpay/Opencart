@@ -25,6 +25,8 @@ class ControllerPaymentWayforpay extends Controller
         $serviceUrl = $this->config->get('wayforpay_serviceUrl');
         $returnUrl = $this->config->get('wayforpay_returnUrl');
 
+        $currency = isset($this->codesCurrency[$order['currency_code']]) ? $this->codesCurrency[$order['currency_code']] : $order['currency_code'];
+        
         $fields = array(
             'orderReference' => $order_id . WayForPay::ORDER_SEPARATOR . time(),
             'merchantAccount' => $this->config->get('wayforpay_merchant'),
@@ -33,17 +35,11 @@ class ControllerPaymentWayforpay extends Controller
             'merchantDomainName' => $_SERVER['HTTP_HOST'],
             'merchantTransactionSecureType' => 'AUTO',
             'amount' => round($order['total'], 2),
-            'currency' => 'UAH',
+            'currency' => $currency,
             'serviceUrl' => $serviceUrl,
             'returnUrl' => $returnUrl,
             'language' => $this->config->get('wayforpay_language')
         );
-
-        $currency = isset($this->codesCurrency[$order['currency_code']]) ? $this->codesCurrency[$order['currency_code']] : $order['currency_code'];
-        if ($currency != 'UAH') {
-            $fields['alternativeCurrency'] = $currency;
-            $fields['alternativeAmount'] = round(($order['total'] * $order['currency_value']), 2);
-        }
 
         $productNames = array();
         $productQty = array();
