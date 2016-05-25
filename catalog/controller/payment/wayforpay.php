@@ -26,7 +26,8 @@ class ControllerPaymentWayforpay extends Controller
         $returnUrl = $this->config->get('wayforpay_returnUrl');
 
         $currency = isset($this->codesCurrency[$order['currency_code']]) ? $this->codesCurrency[$order['currency_code']] : $order['currency_code'];
-        
+        $amount = round(($order['total'] * $order['currency_value']), 2);
+
         $fields = array(
             'orderReference' => $order_id . WayForPay::ORDER_SEPARATOR . time(),
             'merchantAccount' => $this->config->get('wayforpay_merchant'),
@@ -34,7 +35,7 @@ class ControllerPaymentWayforpay extends Controller
             'merchantAuthType' => 'simpleSignature',
             'merchantDomainName' => $_SERVER['HTTP_HOST'],
             'merchantTransactionSecureType' => 'AUTO',
-            'amount' => round($order['total'], 2),
+            'amount' => $amount,
             'currency' => $currency,
             'serviceUrl' => $serviceUrl,
             'returnUrl' => $returnUrl,
