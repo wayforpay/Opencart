@@ -3,13 +3,13 @@
 class ControllerPaymentWayforpay extends Controller
 {
 
-    public $codesCurrency = [
+    public $codesCurrency = array(
             980 => 'UAH',
             840 => 'USD',
             978 => 'EUR',
             643 => 'RUB',
 
-        ];
+        );
 
     public function index()
     {
