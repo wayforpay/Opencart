@@ -1,6 +1,6 @@
 <?php
 
-class ControllerPaymentWayforpay extends Controller
+class ControllerExtensionPaymentWayforpay extends Controller
 {
 
     public $codesCurrency = [
@@ -83,7 +83,7 @@ class ControllerPaymentWayforpay extends Controller
         $data['text_loading'] = 'loading';
         $data['continue'] = $this->url->link('checkout/success');
 
-        return $this->load->view('payment/wayforpay.tpl', $data);
+        return $this->load->view('extension/payment/wayforpay.tpl', $data);
     }
 
     public function confirm()

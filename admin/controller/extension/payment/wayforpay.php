@@ -1,12 +1,12 @@
 <?php
 
-class ControllerPaymentWayforpay extends Controller
+class ControllerExtensionPaymentWayforpay extends Controller
 {
     private $error = array();
 
     public function index()
     {
-        $this->load->language('payment/wayforpay');
+        $this->load->language('extension/payment/wayforpay');
         $this->document->setTitle($this->language->get('heading_title'));
         $this->load->model('setting/setting');
 //------------------------------------------------------------
@@ -31,7 +31,7 @@ class ControllerPaymentWayforpay extends Controller
         $data['text_enabled'] = $this->language->get('text_enabled');
         $data['text_disabled'] = $this->language->get('text_disabled');
 
-        #$data['LUURL'] = "index.php?route=payment/wayforpay/callback";
+        #$data['LUURL'] = "index.php?route=extension/payment/wayforpay/callback";
 
 
 //------------------------------------------------------------
@@ -56,11 +56,11 @@ class ControllerPaymentWayforpay extends Controller
 
         $data['breadcrumbs'][] = array(
             'text' => $this->language->get('heading_title'),
-            'href' => $this->url->link('payment/wayforpay', 'token=' . $this->session->data['token'], 'SSL'),
+            'href' => $this->url->link('extension/payment/wayforpay', 'token=' . $this->session->data['token'], 'SSL'),
             'separator' => ' :: '
         );
 
-        $data['action'] = $this->url->link('payment/wayforpay', 'token=' . $this->session->data['token'], 'SSL');
+        $data['action'] = $this->url->link('extension/payment/wayforpay', 'token=' . $this->session->data['token'], 'SSL');
         $data['cancel'] = $this->url->link('extension/payment', 'token=' . $this->session->data['token'], 'SSL');
 
 //------------------------------------------------------------
@@ -75,9 +75,9 @@ class ControllerPaymentWayforpay extends Controller
             $data[$v] = (isset($this->request->post[$v])) ? $this->request->post[$v] : $this->config->get($v);
             if (defined('HTTP_CATALOG') and defined('HTTPS_CATALOG') and !isset($this->request->post[$v])) {
                 if ($v == 'wayforpay_returnUrl' and empty($data[$v])) {
-                    $data[$v] = (isset($_SERVER['HTTPS']) ? HTTPS_CATALOG : HTTP_CATALOG) . 'index.php?route=payment/wayforpay/response';
+                    $data[$v] = (isset($_SERVER['HTTPS']) ? HTTPS_CATALOG : HTTP_CATALOG) . 'index.php?route=extension/payment/wayforpay/response';
                 } elseif ($v == 'wayforpay_serviceUrl' and empty($data[$v])) {
-                    $data[$v] = (isset($_SERVER['HTTPS']) ? HTTPS_CATALOG : HTTP_CATALOG) . 'index.php?route=payment/wayforpay/callback';
+                    $data[$v] = (isset($_SERVER['HTTPS']) ? HTTPS_CATALOG : HTTP_CATALOG) . 'index.php?route=extension/payment/wayforpay/callback';
                 }
             }
         }
@@ -88,13 +88,13 @@ class ControllerPaymentWayforpay extends Controller
         $data['column_left'] = $this->load->controller('common/column_left');
         $data['footer'] = $this->load->controller('common/footer');
 
-        $this->response->setOutput($this->load->view('payment/wayforpay.tpl', $data));
+        $this->response->setOutput($this->load->view('extension/payment/wayforpay.tpl', $data));
     }
 
 //------------------------------------------------------------
     private function validate()
     {
-        if (!$this->user->hasPermission('modify', 'payment/wayforpay')) {
+        if (!$this->user->hasPermission('modify', 'extension/payment/wayforpay')) {
             $this->error['warning'] = $this->language->get('error_permission');
         }
 
