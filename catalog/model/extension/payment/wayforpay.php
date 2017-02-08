@@ -1,7 +1,7 @@
 <?php 
 class ModelPaymentWayforpay extends Model {
 	public function getMethod($address, $total) {
-		$this->load->language('payment/wayforpay');
+		$this->load->language('extension/payment/wayforpay');
 
 		$method_data = array(
 				'code'       => 'wayforpay',
