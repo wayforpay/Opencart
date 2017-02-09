@@ -100,7 +100,7 @@
                     <label class="col-sm-4 control-label"><?php echo $entry_status; ?></label>
 
                     <div class="col-sm-8"><select name="wayforpay_status" class="form-control">
-                            <? $st0 = $st1 = "";
+                            <?php $st0 = $st1 = "";
                                  if ( $wayforpay_status == 0 ) $st0 = 'selected="selected"';
                                   else $st1 = 'selected="selected"';
                                 ?>
