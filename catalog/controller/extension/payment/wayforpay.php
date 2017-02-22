@@ -160,6 +160,7 @@ class ControllerExtensionPaymentWayforpay extends Controller
 class WayForPay
 {
     const ORDER_APPROVED = 'Approved';
+    const ORDER_HOLD_APPROVED = 'WaitingAuthComplete';
 
     const ORDER_SEPARATOR = '#';
 
@@ -267,7 +268,7 @@ class WayForPay
      */
     public function isPaymentValid($response)
     {
-        
+
         if (!isset($response['merchantSignature']) && isset($response['reason'])) {
             return $response['reason'];
         }
@@ -276,7 +277,10 @@ class WayForPay
             return 'An error has occurred during payment';
         }
 
-        if ($response['transactionStatus'] == self::ORDER_APPROVED) {
+        if (
+            $response['transactionStatus'] == self::ORDER_APPROVED ||
+            $response['transactionStatus'] == self::ORDER_HOLD_APPROVED
+        ) {
             return true;
         }
 
