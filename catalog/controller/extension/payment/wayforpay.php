@@ -121,7 +121,19 @@ class ControllerExtensionPaymentWayforpay extends Controller
             $message = '';
 
             $this->load->model('checkout/order');
-            $this->model_checkout_order->addOrderHistory($order_id, $this->config->get('wayforpay_order_status_id'), $message, false);
+
+            /**
+             * check current order status if no eq wayforpay_order_status_id then confirm
+             */
+            $orderInfo = $this->model_checkout_order->getOrder($order_id);
+            if (
+                $orderInfo &&
+                $orderInfo['order_status_id'] == $this->config->get('wayforpay_order_status_id')
+            ) {
+                //nothing
+            } else {
+                $this->model_checkout_order->addOrderHistory($order_id, $this->config->get('wayforpay_order_status_id'), $message, false);
+            }
 
             $this->response->redirect($this->url->link('checkout/success'));
         } else {
@@ -147,7 +159,19 @@ class ControllerExtensionPaymentWayforpay extends Controller
             $message = '';
 
             $this->load->model('checkout/order');
-            $this->model_checkout_order->addOrderHistory($order_id, $this->config->get('wayforpay_order_status_id'), $message, false);
+
+            /**
+             * check current order status if no eq wayforpay_order_status_id then confirm
+             */
+            $orderInfo = $this->model_checkout_order->getOrder($order_id);
+            if (
+                $orderInfo &&
+                $orderInfo['order_status_id'] == $this->config->get('wayforpay_order_status_id')
+            ) {
+                //nothing
+            } else {
+                $this->model_checkout_order->addOrderHistory($order_id, $this->config->get('wayforpay_order_status_id'), $message, false);
+            }
 
             echo $w4p->getAnswerToGateWay($data);
         } else {
