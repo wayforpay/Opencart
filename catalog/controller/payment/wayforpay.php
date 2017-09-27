@@ -190,6 +190,7 @@ class WayForPay
 {
     const ORDER_APPROVED = 'Approved';
     const ORDER_HOLD_APPROVED = 'WaitingAuthComplete';
+    const ORDER_IS_PENDING = 'Pending';
 
     const ORDER_SEPARATOR = '#';
 
@@ -308,7 +309,8 @@ class WayForPay
 
         if (
             $response['transactionStatus'] == self::ORDER_APPROVED ||
-            $response['transactionStatus'] == self::ORDER_HOLD_APPROVED
+            $response['transactionStatus'] == self::ORDER_HOLD_APPROVED ||
+            $response['transactionStatus'] == self::ORDER_IS_PENDING		
         ) {
             return true;
         }
