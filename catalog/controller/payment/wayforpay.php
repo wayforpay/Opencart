@@ -234,7 +234,7 @@ class WayForPay
         $hash = array();
         foreach ($keys as $dataKey) {
             if (!isset($option[$dataKey])) {
-                continue;
+                $option[$dataKey] = '';
             }
             if (is_array($option[$dataKey])) {
                 foreach ($option[$dataKey] as $v) {
