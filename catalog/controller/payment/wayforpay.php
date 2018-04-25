@@ -50,7 +50,7 @@ class ControllerPaymentWayforpay extends Controller
         foreach ($products as $product) {
             $productNames[] = str_replace(["'", '"', '&#39;', '&'], '', htmlspecialchars_decode($product['name']));
             $productPrices[] = round($product['price']);
-            $productQty[] = $product['quantity'];
+            $productQty[] = intval($product['quantity']);
         }
 
         $fields['productName'] = $productNames;
