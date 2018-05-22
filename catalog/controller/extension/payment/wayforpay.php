@@ -49,7 +49,7 @@ class ControllerExtensionPaymentWayforpay extends Controller
         $products = $this->model_account_order->getOrderProducts($order_id);
         foreach ($products as $product) {
             $productNames[] = str_replace(["'", '"', '&#39;', '&'], '', htmlspecialchars_decode($product['name']));
-            $productPrices[] = round($product['price']);
+            $productPrices[] = round($product['price'], 2);
             $productQty[] = intval(round($product['quantity']));
         }
 
