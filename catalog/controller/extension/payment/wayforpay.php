@@ -47,6 +47,23 @@ class ControllerExtensionPaymentWayforpay extends Controller
         $productPrices = array();
         $this->load->model('account/order');
         $products = $this->model_account_order->getOrderProducts($order_id);
+	if (
+	    !is_array($products) || 
+	    count($products) = 0
+	) {
+	    $products = $this->cart->getProducts();
+	}
+	if (
+	    !is_array($products) ||
+	    count($products) = 0
+	) {
+	    $products[] = [
+		'name'     => 'Оплата товаров',
+		'price'    => $amount,
+		'quantity' => 1,
+	    ];
+	}
+	    
         foreach ($products as $product) {
             $productNames[] = str_replace(["'", '"', '&#39;', '&'], '', htmlspecialchars_decode($product['name']));
             $productPrices[] = round($product['price'], 2);
@@ -179,6 +196,13 @@ class ControllerExtensionPaymentWayforpay extends Controller
         }
         exit();
     }
+	
+    public function getOrderProducts($order_id) {
+        $query = $this->db->query("SELECT * FROM " . DB_PREFIX . "order_product WHERE order_id = '" . (int)$order_id . "'");
+
+        return $query->rows;
+    }
+
 }
 
 class WayForPay
