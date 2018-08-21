@@ -49,7 +49,7 @@ class ControllerExtensionPaymentWayforpay extends Controller
         $products = $this->model_account_order->getOrderProducts($order_id);
 	if (
 	    !is_array($products) || 
-	    count($products) = 0
+	    count($products) == 0
 	) {
 	    $products = $this->cart->getProducts();
 	}
