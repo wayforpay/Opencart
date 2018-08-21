@@ -55,7 +55,7 @@ class ControllerExtensionPaymentWayforpay extends Controller
 	}
 	if (
 	    !is_array($products) ||
-	    count($products) = 0
+	    count($products) == 0
 	) {
 	    $products[] = [
 		'name'     => 'Оплата товаров',
