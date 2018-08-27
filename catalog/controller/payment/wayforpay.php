@@ -47,6 +47,17 @@ class ControllerPaymentWayforpay extends Controller
         $productPrices = array();
         $this->load->model('account/order');
         $products = $this->model_account_order->getOrderProducts($order_id);
+        if (
+	    !is_array($products) ||
+	    count($products) == 0
+	) {
+	    $products[] = [
+		'name'     => 'Оплата товаров',
+		'price'    => $amount,
+		'quantity' => 1,
+	    ];
+	}
+	    
         foreach ($products as $product) {
             $productNames[] = str_replace(array("'", '"', '&#39;', '&'), '', htmlspecialchars_decode($product['name']));
             $productPrices[] = round($product['price'], 2);
