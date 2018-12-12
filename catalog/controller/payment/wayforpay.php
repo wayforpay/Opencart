@@ -51,11 +51,11 @@ class ControllerPaymentWayforpay extends Controller
 	    !is_array($products) ||
 	    count($products) == 0
 	) {
-	    $products[] = [
+	    $products[] = array(
 		'name'     => 'Оплата товаров',
 		'price'    => $amount,
 		'quantity' => 1,
-	    ];
+	    );
 	}
 	    
         foreach ($products as $product) {
