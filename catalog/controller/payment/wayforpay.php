@@ -311,6 +311,10 @@ class WayForPay
             return true;
         }
 
+	if ($response['transactionStatus'] == 'InProcessing') {
+            return 'Transaction in processing';
+        }
+
         return false;
     }
 
