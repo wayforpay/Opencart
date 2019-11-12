@@ -100,7 +100,7 @@ class ControllerExtensionPaymentWayforpay extends Controller
         $data['text_loading'] = 'loading';
         $data['continue'] = $this->url->link('checkout/success');
 
-        return $this->load->view('extension/payment/wayforpay.tpl', $data);
+        return $this->load->view('extension/payment/wayforpay', $data);
     }
 
     public function confirm()
@@ -155,7 +155,7 @@ class ControllerExtensionPaymentWayforpay extends Controller
             $this->response->redirect($this->url->link('checkout/success'));
         } else {
             $this->session->data['error'] = $paymentInfo;
-            $this->response->redirect($this->url->link('checkout/checkout', '', 'SSL'));
+            $this->response->redirect($this->url->link('checkout/failure', '', 'SSL'));
         }
     }
 
